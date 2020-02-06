@@ -10,10 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +49,9 @@ public class LogEvent {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
             .ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSZ")
             .withZone( ZoneId.systemDefault());
+
+    public static final DateTimeFormatter DATE_TIME_FORMATTER_ALT = DateTimeFormatter
+            .ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSZ");
 
     private Instant time;
 
@@ -111,8 +116,13 @@ public class LogEvent {
         logger.warn("New log event {}.", message);
         String time = (String) message.getOrDefault(TIMESTAMP_KEY, message.get(TIMESTAMP_ALT_KEY));
 
-        TemporalAccessor accessor = DATE_TIME_FORMATTER.parse(time);
-        this.time = Instant.from(accessor);
+        try {
+            TemporalAccessor accessor = DATE_TIME_FORMATTER.parse(time);
+            this.time = Instant.from(accessor);
+        } catch (DateTimeParseException e) {
+            TemporalAccessor accessor = DATE_TIME_FORMATTER_ALT.parse(time);
+            this.time = Instant.from(accessor);
+        }
     }
 
     public void addDuration(Duration duration) {
