@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Timed;
 import io.opentelemetry.instrumentation.annotations.SpanAttribute;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 
+import io.quarkus.logging.Log;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Transformer;
 import org.apache.kafka.streams.processor.ProcessorContext;
@@ -58,6 +59,9 @@ class MergeTransformer implements Transformer<String, LogEvent, KeyValue<String,
          */
         if (key == null) {
             key = thisLogEvent.getMdcProcessContext().orElse(DEFAULT_KAFKA_MESSAGE_KEY);
+            Log.infof("Key in MergeTransformer set from null to: %s", key);
+        } else {
+            Log.infof("Key in MergeTransformer set to: %s", key);
         }
 
         if (thisLogEvent == null) {
