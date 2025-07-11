@@ -14,6 +14,8 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.processor.internals.DefaultKafkaClientSupplier;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ales Justin
@@ -22,6 +24,7 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 @Vetoed
 public class Application {
 
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
     private KafkaStreams streams;
 
     public Application(
@@ -32,6 +35,7 @@ public class Application {
         LogProcessorTopology logProcessorTopology = new LogProcessorTopology(inputTopic, outputTopic, durationsTopic);
 
         Topology topology = logProcessorTopology.buildTopology(kafkaProperties);
+        log.info("Topology: {}", topology.describe());
         streams = new KafkaStreams(topology, kafkaProperties, new TracingKafkaClientSupplier());
     }
 
