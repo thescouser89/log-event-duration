@@ -144,7 +144,6 @@ class MergeProcessor implements Processor<String, LogEvent, String, LogEvent> {
     private void sendWithNewTimestamp(String key, LogEvent event) {
         Record<String, LogEvent> record = new Record<String, LogEvent>(key, event, System.currentTimeMillis());
         context.forward(record);
-        context.
     }
 
     @Override
